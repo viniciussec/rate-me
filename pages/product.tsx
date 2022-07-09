@@ -8,7 +8,7 @@ export default function Product() {
     <Dashboard>
       <div className="flex flex-col ">
         <h1 className="text-xl font-semibold">Ventilador zap</h1>
-        <div className="grid gap-4 mt-4 md:grid-cols-2">
+        <div className="grid gap-4 p-4 mt-4 bg-gray-200 rounded-md md:grid-cols-2">
           <div className="w-full h-40 bg-gray-400 rounded-md"></div>
           <div className="flex flex-col space-y-4">
             <p className="">
