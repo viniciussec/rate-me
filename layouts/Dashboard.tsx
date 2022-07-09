@@ -10,7 +10,7 @@ export default function Dashboard(props: { children: React.ReactNode }) {
           <div className="cursor-pointer" onClick={() => router.push("/")}>
             Rate <p className="inline text-red-600">me</p>
           </div>
-          <div className="space-x-4">
+          <div className="hidden space-x-4 sm:block">
             <button
               onClick={() => router.push("new-rating")}
               className="px-2 py-1 text-white bg-green-600 rounded-md"
