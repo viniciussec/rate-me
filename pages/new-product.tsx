@@ -15,7 +15,7 @@ export default function NewProduct() {
   async function uploadImage(image: File) {
     console.log(image);
 
-    fetch("http://localhost:3001/image", {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/image`, {
       method: "POST",
       body: image,
       headers: {
