@@ -1,9 +1,10 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import LoadingScreen from "../components/LoadingScreen";
-import { ProductProps } from "../components/ProductCard";
+import { loadAverageRating, ProductProps } from "../components/ProductCard";
 import Dashboard from "../layouts/Dashboard";
 import API from "../services/api";
+import Image from "next/image";
 
 export default function Product() {
   const router = useRouter();
@@ -30,8 +31,23 @@ export default function Product() {
     <Dashboard>
       <div className="flex flex-col ">
         <h1 className="text-xl font-semibold">{product?.name}</h1>
-        <div className="grid gap-4 p-4 mt-4 bg-gray-200 rounded-md md:grid-cols-2">
-          <div className="w-full h-40 bg-gray-400 rounded-md"></div>
+        <div className="flex justify-around p-4 mt-4 bg-gray-200 rounded-md">
+          <div className="flex items-center justify-center rounded-md">
+            {!product.imageUrl && (
+              <div className="flex items-center justify-center w-20 h-20 text-xl font-semibold bg-gray-400 rounded-full">
+                ?
+              </div>
+            )}
+            {product.imageUrl && (
+              <Image
+                className="rounded-full"
+                width="100%"
+                height="100%"
+                src={product?.imageUrl}
+                alt="Imagem"
+              ></Image>
+            )}
+          </div>
           <div className="flex flex-col space-y-4">
             <p className="">
               Nome: <b>{product?.name}</b>
@@ -40,7 +56,8 @@ export default function Product() {
               Fabricante: <b>{product?.manufacturer}</b>
             </p>
             <p className="">
-              Nota média: <b className="text-yellow-500">4.5 ★</b>
+              Nota média:
+              <b className="text-yellow-500">{loadAverageRating(product)} ★</b>
             </p>
             <div>
               <button

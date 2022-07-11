@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Dashboard from "../layouts/Dashboard";
 import API from "../services/api";
 
@@ -12,19 +12,43 @@ export default function NewProduct() {
   const [image, setImage] = useState("");
   const [description, setDescription] = useState("");
 
+  async function uploadImage(image: File) {
+    console.log(image);
+
+    fetch("http://localhost:3001/image", {
+      method: "POST",
+      body: image,
+      headers: {
+        "Content-Type": "image/jpeg",
+      },
+    }).then((response) => {
+      if (response.ok) {
+        response.json().then((json) => {
+          console.log(json);
+          setImage(json.imageUrl);
+        });
+      }
+    });
+  }
+
   async function onSubmit(e: any) {
     e.preventDefault();
+    console.log({ name, manufacturer, category, image, description });
+
     const response = await API.post("/products", {
       name,
       manufacturer,
       category,
       description,
+      imageUrl: image,
     });
 
     if (response.status === 201) {
       router.push("/");
     }
   }
+
+  useEffect(() => console.log(image), [image]);
 
   return (
     <Dashboard>
@@ -74,16 +98,19 @@ export default function NewProduct() {
               placeholder="Produto 1"
               type="file"
               className="hidden p-2 bg-gray-200 rounded-md"
-              onChange={(e) => setImage(e.target.value)}
-              value={image}
+              onChange={(e) => {
+                if (!e.target.files) return;
+                uploadImage(e.target.files[0]);
+              }}
             />
-            <div className="flex justify-center w-full">
+            <div className="flex items-center justify-center w-full">
               <label
                 className="px-2 py-1 text-white bg-red-500 rounded-md cursor-pointer"
                 htmlFor="image"
               >
                 Escolher imagem
               </label>
+              {image && <img className="w-10 h-10 ml-2 rounded-full" src={image} alt="Imagem" />}
             </div>
           </div>
           <div className="flex flex-col space-y-2 md:col-span-2">
