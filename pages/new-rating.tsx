@@ -1,18 +1,52 @@
-import { useState } from "react";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import { ProductProps } from "../components/ProductCard";
 import Dashboard from "../layouts/Dashboard";
+import API from "../services/api";
+
+export type RatingProps = {
+  id: number;
+  productId: number;
+  rating: number;
+  comment: string;
+};
 
 export default function NewRating() {
+  const router = useRouter();
+
   const [rating, setRating] = useState(0);
   const [product, setProduct] = useState("");
   const [comments, setComments] = useState("");
+  const [products, setProducts] = useState<ProductProps[]>();
 
   async function onSubmit() {
-    console.log({
-      rating,
-      product,
-      comments,
+    const response = await API.post("/ratings", {
+      productId: Number(product),
+      rating: Number(rating),
+      comment: comments,
     });
+
+    if (response.status === 201) {
+      alert("Avaliação realizada com sucesso!");
+      router.push("/");
+    }
   }
+
+  useEffect(() => {
+    async function loadProducts() {
+      const response = await API.get("/products");
+
+      setProducts(response.data);
+    }
+
+    loadProducts();
+  }, []);
+
+  useEffect(() => {
+    if (router.query.id) {
+      setProduct(String(router.query.id));
+    }
+  }, [router.query.id]);
 
   return (
     <Dashboard>
@@ -24,12 +58,16 @@ export default function NewRating() {
             <select
               className="p-2 bg-gray-200 rounded-md"
               onChange={(e) => setProduct(e.target.value)}
+              value={product}
               name=""
               id=""
             >
-              <option value="">Produto 1</option>
-              <option value="">Produto 2</option>
-              <option value="">Produto 3</option>
+              {products &&
+                products?.map((product) => (
+                  <option key={product.id} value={product.id}>
+                    {product.name}
+                  </option>
+                ))}
             </select>
           </div>
           <div className="flex flex-col space-y-2">
@@ -105,7 +143,13 @@ export default function NewRating() {
             />
           </div>
           <div className="flex justify-end md:col-span-2">
-            <button className="px-2 py-1 text-white bg-red-500 rounded-md">
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                onSubmit();
+              }}
+              className="px-2 py-1 text-white bg-red-500 rounded-md"
+            >
               Avaliar
             </button>
           </div>

@@ -1,21 +1,29 @@
+import { useRouter } from "next/router";
 import { useState } from "react";
 import Dashboard from "../layouts/Dashboard";
+import API from "../services/api";
 
 export default function NewProduct() {
+  const router = useRouter();
+
   const [name, setName] = useState("");
   const [manufacturer, setManufacturer] = useState("");
   const [category, setCategory] = useState("");
   const [image, setImage] = useState("");
   const [description, setDescription] = useState("");
 
-  async function onSubmit() {
-    console.log({
+  async function onSubmit(e: any) {
+    e.preventDefault();
+    const response = await API.post("/products", {
       name,
       manufacturer,
       category,
-      image,
       description,
     });
+
+    if (response.status === 201) {
+      router.push("/");
+    }
   }
 
   return (
@@ -52,10 +60,10 @@ export default function NewProduct() {
               value={category}
               onChange={(e) => setCategory(e.target.value)}
             >
-              <option value="">Jogos</option>
-              <option value="">Eletrônicos</option>
-              <option value="">Serviços</option>
-              <option value="">Automóveis</option>
+              <option value="games">Jogos</option>
+              <option value="electronics">Eletrônicos</option>
+              <option value="services">Serviços</option>
+              <option value="automobiles">Automóveis</option>
             </select>
           </div>
           <div className="flex flex-col justify-center space-y-2">
@@ -88,7 +96,7 @@ export default function NewProduct() {
           </div>
           <div className="flex justify-end md:col-span-2">
             <button
-              onClick={() => onSubmit()}
+              onClick={(e) => onSubmit(e)}
               className="px-2 py-1 text-white bg-red-500 rounded-md"
             >
               Registrar produto
