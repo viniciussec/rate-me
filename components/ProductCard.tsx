@@ -1,18 +1,7 @@
 import { useRouter } from "next/router";
 import { RatingProps } from "../pages/new-rating";
 import Image from "next/image";
-
-export function loadAverageRating(product: ProductProps) {
-  if (product.ratings.length === 0) {
-    return (0).toFixed(1);
-  }
-
-  let sum = 0;
-  product.ratings.forEach((rating) => {
-    sum += rating.rating;
-  });
-  return Number((sum * 1.0) / product.ratings.length).toFixed(1);
-}
+import { useEffect, useState } from "react";
 
 export type ProductProps = {
   id: number;
@@ -26,6 +15,27 @@ export type ProductProps = {
 
 export default function ProductCard(props: { product: ProductProps }) {
   const router = useRouter();
+  const [averageRate, setAverageRate] = useState(0);
+
+  useEffect(() => {
+    async function loadAverageRating(product: ProductProps) {
+      fetch(`${process.env.NEXT_PUBLIC_SERVERLESS_URL}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ product }),
+      }).then((response) => {
+        if (response.ok) {
+          response.json().then((data) => {
+            setAverageRate(data);
+          });
+        }
+      });
+    }
+
+    loadAverageRating(props.product);
+  }, [props.product]);
 
   return (
     <div
@@ -50,7 +60,7 @@ export default function ProductCard(props: { product: ProductProps }) {
       </div>
       <div className="flex justify-between mt-4 font-semibold">
         <p>{props.product.name}</p>
-        <p className="text-yellow-500">{loadAverageRating(props.product)} ★</p>
+        <p className="text-yellow-500">{averageRate} ★</p>
       </div>
     </div>
   );

@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import LoadingScreen from "../components/LoadingScreen";
-import { loadAverageRating, ProductProps } from "../components/ProductCard";
+import { ProductProps } from "../components/ProductCard";
 import Dashboard from "../layouts/Dashboard";
 import API from "../services/api";
 import Image from "next/image";
@@ -22,6 +22,26 @@ export default function Product() {
     }
     loadProduct();
   }, [router.query.id]);
+
+  useEffect(() => {
+    async function loadAverageRating(product: ProductProps | undefined) {
+      fetch(`${process.env.NEXT_PUBLIC_SERVERLESS_URL}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ product }),
+      }).then((response) => {
+        if (response.ok) {
+          response.json().then((data) => {
+            setAverageRate(data);
+          });
+        }
+      });
+    }
+
+    loadAverageRating(product);
+  }, [product]);
 
   if (!product) {
     return <LoadingScreen></LoadingScreen>;
@@ -57,7 +77,7 @@ export default function Product() {
             </p>
             <p className="">
               Nota média:
-              <b className="text-yellow-500">{loadAverageRating(product)} ★</b>
+              <b className="text-yellow-500">{averageRate} ★</b>
             </p>
             <div>
               <button
